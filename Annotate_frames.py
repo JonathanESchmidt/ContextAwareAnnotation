@@ -5,7 +5,7 @@ import cv2
 
 def saveDetection(ID, x, y, width, height, filename):
     with open(filename, 'a+', newline='') as file:
-        file.write(f'{ID},{x},{y},{width},{height}')
+        file.write(f'{ID} {x} {y} {width} {height}')
         file.write('\n')
 
 def centerStyle(class_ID, x, y, width, height, label):
