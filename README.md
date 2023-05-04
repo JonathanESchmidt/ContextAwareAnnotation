@@ -7,3 +7,5 @@ Repository for annotation tools used for context aware navigation
 - The *Rotate.py* and *Translate.py* are used to augment the the dataset while saving with a new filename for saving images as series for training.
 - The *Annotate_frames.py* file is used for annotating bounding boxes for different setups - enables one or multiple boxes depending on usecase.
 - The *ShowAnnotation.py* is used for sanity check and to see the Bounding Boxes.
+- The *ImageList.py* is used to generate image lists for YOLO to know the location of images.
+- The *LabelFix.py* file is used to fix labels that contains commas instead of spaces.
