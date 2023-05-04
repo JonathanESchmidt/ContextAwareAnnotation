@@ -3,18 +3,15 @@ import argparse
 from pathlib import Path
 import cv2
 
-
 def saveDetection(ID, x, y, width, height, filename):
     with open(filename, 'a+', newline='') as file:
         file.write(f'{ID},{x},{y},{width},{height}')
         file.write('\n')
 
-
 def centerStyle(class_ID, x, y, width, height, label):
     x_center = x + width/2
     y_center = y + height/2
     saveDetection(class_ID, x_center, y_center, width, height, label)
-
 
 def cornersStyle(class_ID, x, y, width, height, label):
     x1 = x
@@ -23,8 +20,7 @@ def cornersStyle(class_ID, x, y, width, height, label):
     y2 = y + height
     saveDetection(class_ID, x1, y1, x2, y2, label)
 
-
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--BBtype', type=str, default="center",
                         help='Type of annotation. Choose: center, corner or corners')
@@ -36,9 +32,9 @@ if __name__ == '__main__':
                         help='path to folder with labels for annotation')
     parser.add_argument('--label_extention', type=str, default=".txt",
                         help='label extention - currently only for .txt')
-    parser.add_argument('--combine_BB', type=bool, default="False",
+    parser.add_argument('--combine_BB', type=bool, default=False,
                         help='combine BBoxes for certain types of annotation.')
-    parser.add_argument('--empty_label', type=bool, default="True",
+    parser.add_argument('--empty_label', type=bool, default=False,
                         help='create empty label files.')
 
     args = parser.parse_args()
@@ -47,9 +43,11 @@ if __name__ == '__main__':
 
     try:
         labels.mkdir(parents=False, exist_ok=False)
+        print(f"Created labels folder")
     except:
         pass
-
+    
+    count = 0
     images = Path(args.img_directory)
     for image in images.iterdir():
 
@@ -104,3 +102,10 @@ if __name__ == '__main__':
         else:
             with open(label, 'a+', newline='') as file:
                 file.write('\n')
+
+        count +=1
+        if (count % 1000) == 0:
+            print(f"Number of images labeled = {count}")
+
+if __name__ == '__main__':
+    main()

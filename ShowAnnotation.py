@@ -37,6 +37,6 @@ if __name__ == '__main__':
 
             cv2.rectangle(img, (x, y), (x+width, y+height), (255, 0, 0), 3)
         cv2.imshow("result", img)
-        cv2.waitKey(5)
+        cv2.waitKey(500)
         print(f"Frame: {image}")
     cv2.destroyAllWindows()
