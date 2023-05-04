@@ -20,12 +20,13 @@ if __name__ == '__main__':
         (h, w) = img.shape[:2] 
         (cX, cY) = (w // 2, h // 2) # image center for rotation
 
-        for i in range(7):
+        for i in range(15):
 
-            angle = 45*(i+1) # rotate our image by 45 per iteration degrees around the center of the image
+            angle = 22.5*(i+1) # rotate our image by 22.5 degrees per iteration around the center of the image
             M = cv2.getRotationMatrix2D((cX, cY), angle, 1.0)
             rotated = cv2.warpAffine(img, M, (w, h), borderValue = (0, 0, 0))
 
-            path = Path(images / f"{int(image.stem)+(1+i)*10000000}{image.suffix}")
+            path = Path(images / f"{str(int(image.stem)+(1+i)*1000000).zfill(8)}{image.suffix}")
+            
             cv2.imwrite(str(path), rotated)
 
