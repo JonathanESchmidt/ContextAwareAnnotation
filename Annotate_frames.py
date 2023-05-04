@@ -38,6 +38,8 @@ if __name__ == '__main__':
                         help='label extention - currently only for .txt')
     parser.add_argument('--combine_BB', type=bool, default="False",
                         help='combine BBoxes for certain types of annotation.')
+    parser.add_argument('--empty_label', type=bool, default="True",
+                        help='create empty label files.')
 
     args = parser.parse_args()
 
@@ -59,42 +61,46 @@ if __name__ == '__main__':
         contours, hierarchy = cv2.findContours(
             binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-        if not args.combine_BB:
-            for contour in contours:
-                x, y, w, h = cv2.boundingRect(contour)
+        if not args.empty_label:
+            if not args.combine_BB:
+                for contour in contours:
+                    x, y, w, h = cv2.boundingRect(contour)
+
+                    if args.BBtype == "center":
+                        centerStyle(args.class_ID, x/img.shape[1], y/img.shape[0],
+                                    w/img.shape[1], h/img.shape[0], label)
+                    elif args.BBtype == "corners":
+                        cornersStyle(args.class_ID, x/img.shape[1], y/img.shape[0],
+                                    w/img.shape[1], h/img.shape[0], label)
+
+                    elif args.BBtype == "corner":
+                        saveDetection(args.class_ID, x/img.shape[1], y/img.shape[0],
+                                    w/img.shape[1], h/img.shape[0], label)
+            
+            elif args.combine_BB:
+                x_min = 99999
+                x_max = -1
+                y_min = 99999
+                y_max = -1
+
+                for contour in contours:
+                    x, y, w, h = cv2.boundingRect(contour)
+
+                    if x < x_min: x_min = x
+                    if x + w > x_max: x_max = x + w
+                    if y < y_min: y_min = y
+                    if y + h > y_max: y_max = y + h
 
                 if args.BBtype == "center":
-                    centerStyle(args.class_ID, x/img.shape[1], y/img.shape[0],
-                                w/img.shape[1], h/img.shape[0], label)
+                    centerStyle(args.class_ID, x_min/img.shape[1], y_min/img.shape[0],
+                                    (x_max - x_min)/img.shape[1], (y_max - y_min)/img.shape[0], label)
                 elif args.BBtype == "corners":
-                    cornersStyle(args.class_ID, x/img.shape[1], y/img.shape[0],
-                                w/img.shape[1], h/img.shape[0], label)
+                    cornersStyle(args.class_ID, x_min/img.shape[1], y_min/img.shape[0],
+                                    (x_max - x_min)/img.shape[1], (y_max - y_min)/img.shape[0], label)
 
                 elif args.BBtype == "corner":
-                    saveDetection(args.class_ID, x/img.shape[1], y/img.shape[0],
-                                w/img.shape[1], h/img.shape[0], label)
-        
-        elif args.combine_BB:
-            x_min = 99999
-            x_max = -1
-            y_min = 99999
-            y_max = -1
-
-            for contour in contours:
-                x, y, w, h = cv2.boundingRect(contour)
-
-                if x < x_min: x_min = x
-                if x + w > x_max: x_max = x + w
-                if y < y_min: y_min = y
-                if y + h > y_max: y_max = y + h
-
-            if args.BBtype == "center":
-                centerStyle(args.class_ID, x_min/img.shape[1], y_min/img.shape[0],
-                                (x_max - x_min)/img.shape[1], (y_max - y_min)/img.shape[0], label)
-            elif args.BBtype == "corners":
-                cornersStyle(args.class_ID, x_min/img.shape[1], y_min/img.shape[0],
-                                (x_max - x_min)/img.shape[1], (y_max - y_min)/img.shape[0], label)
-
-            elif args.BBtype == "corner":
-                saveDetection(args.class_ID, x_min/img.shape[1], y_min/img.shape[0],
-                                (x_max - x_min)/img.shape[1], (y_max - y_min)/img.shape[0], label)
+                    saveDetection(args.class_ID, x_min/img.shape[1], y_min/img.shape[0],
+                                    (x_max - x_min)/img.shape[1], (y_max - y_min)/img.shape[0], label)
+        else:
+            with open(label, 'a+', newline='') as file:
+                file.write('\n')
